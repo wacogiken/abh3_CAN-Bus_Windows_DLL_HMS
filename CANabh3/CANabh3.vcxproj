@@ -115,6 +115,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="CANabh3.def" />
   </ItemGroup>
   <ItemGroup>
