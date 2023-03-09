@@ -5,18 +5,18 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
 <tr><th align="center" valign="center" bgcolor="blue"><font color="white">Device of ABH3 (preminary outward-appearance)</font></th></tr>
 <tr><td align="center" valign="center">
 
-![](img/abh3.png)
+![](img/ABH3.png)
 </td></tr>
 </table>
 
-<table border="1">
+<table border="0">
 <tr><td><h2>About this</h2>
 Control for ABH3 from Windows-PC.
 </td></tr></table>
 
 
 <!-- Prerequisites -->
-<table border="1">
+<table border="0">
 <tr><td><h2>Prerequisites</h2>
 <table border="1">
 <tr>
@@ -30,12 +30,8 @@ Control for ABH3 from Windows-PC.
 </td></tr>
 </table>
 
-
-
-
-
 <!-- Document -->
-<table border="1">
+<table border="0">
 <tr><td><h2>Documentation</h2>
 See folder of document.
 </td></tr></table>
