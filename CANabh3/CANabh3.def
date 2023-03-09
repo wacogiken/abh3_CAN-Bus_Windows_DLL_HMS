@@ -1,0 +1,53 @@
+LIBRARY      "CANabh3"
+
+EXPORTS
+
+	InitInstance			@2
+	ExitInstance
+	GetInterfaceCount
+	SetInterface
+	GetCurrentInterface
+	IsOpenInterface
+	SetOpenTimeout
+	SetSendTimeout
+	SetRecvTimeout
+	SetHostID
+	GetHostID
+	SetBaudrate
+	GetBaudrate
+	GetTm
+	GetCounter
+	GetCANerror
+	ResetCANerror
+
+	abh3_can_init
+    abh3_can_port_init
+	abh3_can_cmd_init
+	abh3_can_cmdAY
+	abh3_can_cmdBX
+	abh3_can_cmd
+	abh3_can_opSet
+	abh3_can_opBitSet
+	abh3_can_cmdAndopSet
+	abh3_can_reqBRD
+	abh3_can_trans
+	abh3_can_copylastdata
+	abh3_can_resetlastdata
+	abh3_can_read
+	abh3_can_flush
+	abh3_can_finish
+
+	cnvVel2CAN
+	cnvCAN2Vel
+	cnvCur2CAN
+	cnvCAN2Cur
+	cnvCAN2Load
+	cnvCAN2Analog
+	cnvCAN2Volt
+	flt_to_pkflt
+	pkflt_to_flt
+	str_to_pkfltA
+	str_to_pkfltW
+	pkflt_to_strA
+	pkflt_to_strW
+	

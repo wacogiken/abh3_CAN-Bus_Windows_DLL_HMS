@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANabh3", "CANabh3\CANabh3.vcxproj", "{96C12A57-6A4F-4436-9FC7-3865061F9B99}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Debug|x64.ActiveCfg = Debug|x64
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Debug|x64.Build.0 = Debug|x64
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Debug|x86.ActiveCfg = Debug|Win32
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Debug|x86.Build.0 = Debug|Win32
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Release|x64.ActiveCfg = Release|x64
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Release|x64.Build.0 = Release|x64
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Release|x86.ActiveCfg = Release|Win32
+		{96C12A57-6A4F-4436-9FC7-3865061F9B99}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD1E9077-D09E-429B-AEE6-4A3809934601}
+	EndGlobalSection
+EndGlobal
