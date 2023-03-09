@@ -3,7 +3,10 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
 
 <table width="100%" border="0">
 <tr><th align="center" valign="center" bgcolor="blue"><font color="white">Device of ABH3 (preminary outward-appearance)</font></th></tr>
-<tr><td align="center" valign="center"><img src="./img/abh3.png"></td></tr>
+<tr><td align="center" valign="center">
+
+![](img/abh3.png)
+</td></tr>
 </table>
 
 <table border="1">
