@@ -14,7 +14,6 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
 Control for ABH3 from Windows-PC.
 </td></tr></table>
 
-
 <!-- Prerequisites -->
 <table border="0">
 <tr><td><h2>Prerequisites</h2>
