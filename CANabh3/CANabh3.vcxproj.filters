@@ -82,4 +82,9 @@
   <ItemGroup>
     <Text Include="History.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\img\ABH3.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

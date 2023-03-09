@@ -121,6 +121,9 @@
   <ItemGroup>
     <Text Include="History.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\img\ABH3.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
