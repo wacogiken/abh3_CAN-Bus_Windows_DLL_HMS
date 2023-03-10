@@ -38,18 +38,22 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
 
 <!-- Version table -->
 <table border="1">
-    <tr>
-        <th bgcolor="blue"><font color="white">Version</font></th>
-        <th bgcolor="blue"><font color="white">Date</font></th>
-        <th bgcolor="blue"><font color="white">Auth</font></th>
-        <th bgcolor="blue"><font color="white">Notice</font></th>
-    </tr>
-    <tr>
-        <td>1.0.0.1</td>
-        <td>2023/03/09</td>
-        <td>Y.OGAWA</td>
-        <td>1st release</td>
-    </tr>
+   <tr><td><h2>History</h2>
+    <table border="1">
+        <tr>
+            <th bgcolor="blue"><font color="white">Version</font></th>
+            <th bgcolor="blue"><font color="white">Date</font></th>
+            <th bgcolor="blue"><font color="white">Auth</font></th>
+            <th bgcolor="blue"><font color="white">Notice</font></th>
+        </tr>
+        <tr>
+            <td>1.0.0.1</td>
+            <td>2023/03/09</td>
+            <td>Y.OGAWA</td>
+            <td>1st release</td>
+        </tr>
+    </table>
+    </td></tr>
 </table>
 
 
