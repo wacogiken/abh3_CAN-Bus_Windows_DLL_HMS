@@ -20,7 +20,7 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
 <table border="0">
     <tr><td><h2>Prerequisites</h2>
     <table border="1">
-        <tr><td bgcolor="blue"><font color="white">Item</font></td><td bgcolor="blue"><font color="white">Information</font></td></tr>
+        <tr><th bgcolor="blue"><font color="white">Item</font></th><th bgcolor="blue"><font color="white">Information</font></th></tr>
         <tr><td align="center">OS</td><td align="center">Windows 10 (x64) or Windows 11 (x64)</td></tr>
         <tr><td align="center">Compiler</td><td align="center">Microsoft Visual Studio 2019 or later.</td></tr>
         <tr><td align="center">Interface</td><td align="center">Ixxat USB-to-CAN V2</td></tr>
