@@ -2,6 +2,10 @@
 
 Date		Auth			Notice
 ======================================================================
+2023/03/28	Y.OGAWA			2nd release
+							バス占有帯域の計算元サイズが間違っていた為修正
+							(CRCd,ACK,ACKd,EOF,ITMの分が入ってない)、
+
 2023/03/03	Y.OGAWA			1st release (based CANa31.dll)
 							前身となるCANa31.dllから以下を変更
 							通信先の個別指定

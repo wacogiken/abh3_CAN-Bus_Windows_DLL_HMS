@@ -154,8 +154,8 @@ protected:
 	//受信サイズカウンタに値を加算
 	void AddCounter(uint32_t nDLCsize)
 		{
-		//実際のバス占有サイズは、ヘッダ54bits + データbits数
-		uint32_t nBitSize = 54 + (nDLCsize * 8);
+		//実際のバス占有サイズは、ヘッダ54bits + (CRCd:1 + ACK:1 + ACKd:1 + EOF:7 + ITM:3) データbits数
+		uint32_t nBitSize = 54 + 13 + (nDLCsize * 8);
 		m_var.counter.nBitSize += nBitSize;
 		}
 
