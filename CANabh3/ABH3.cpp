@@ -38,43 +38,13 @@
 //	ABH3用CAN制御クラス
 //
 //履歴
-//	2020/09/xx	yo0043		1st release
-//	2020/09/29	yo0043		2nd release
-//							送信長を8バイト未満にする必要が有る為、幾つかの関数に送信長を追加
-//							マルチパケットのデフォルト要求数を 0xff -> 0x08 に変更
-//							マルチパケットを途中で中止する場合にABORTを発行する様に修正
-//							（送信に失敗した場合が主な原因の為、ABORTが実際に送信されるかは時の運）
-//	2021/02/15	yo0043		3rd release
-//							コメント追加のみでプログラムに変更無し
-//
-
-/*
-動作原理変更
-
-前からある関数は通常通り動作させるが、受信情報(CANABH3_RESULT構造体)の指定有無で
-受信するか判断する。（NULL指定なら送信のみとなる）
-受信する場合は、abh3_can_recv関数（現在仮設置）の様に、目的のパケットが来る迄、
-連続受信し、受信した物が通信相手から来た物であれば現在の保存値を更新する。
-
-アプリケーションが非同期受信する場合は、この保存値を一定周期で取得し、
-更新された要素（更新フラグが成立している物）の表示を更新して、フラグを解除する。
-（保存値取得は一括だが、フラグ解除は番号を指定して行う）
-
-
-//覚書
-
-//受信バッファのクリア
-ClearRecvBuffer();
-
-
-
-*/
-
-
-
+//	2023/03/31	yo0043		1th release
+//							前のCAbh3クラスから大幅変更の為、別物として扱う
+//							受信バッファを指定しない通信要求は、送信のみ行う
+//							インターフェースのオープンクローズにも排他制御を入れる
 
 #include "pch.h"
-#include <memory.h>		//memset,
+#include <memory.h>
 #include "Abh3.h"
 
 //安全な削除
@@ -168,14 +138,15 @@ int32_t CAbh3::OpenInterface()
 //開いたインターフェースを閉じる
 void CAbh3::CloseInterface()
 	{
+	//開いているCANインターフェース情報を解除
+	m_pVar->nOpenDevice = 0;
+
 	//デバイス登録有り？
 	if(IsValidDevice())
 		{
 		//CANインターフェースを閉じる
 		m_pVar->pDeviceClass->OnCloseInterface();
 		}
-	//開いているCANインターフェース情報を解除
-	m_pVar->nOpenDevice = 0;
 	}
 
 //現在開いているインターフェース番号を取得
@@ -301,7 +272,18 @@ int32_t CAbh3::abh3_can_init(uint8_t nTargetID,pCANABH3_RESULT pPtr)
 //
 int32_t CAbh3::abh3_can_port_init()
 	{
-	int32_t nResult = OpenInterface();
+	int32_t nResult = 0;
+
+	//通信排他制御用のセマフォを取得
+	if(Lock() == 0)
+		{
+		nResult = OpenInterface();
+		
+		Unlock();
+		}
+	else
+		nResult = -1;
+
 	return(nResult);
 	}
 
@@ -683,7 +665,13 @@ int32_t CAbh3::abh3_can_flush()
 //回線を閉じる
 int32_t CAbh3::abh3_can_finish()
 	{
-	CloseInterface();
+	//通信排他制御用のセマフォを取得
+	if(Lock() == 0)
+		{
+		CloseInterface();
+		Unlock();
+		}
+
 	return(0);
 	}
 
@@ -790,7 +778,9 @@ int32_t CAbh3::CanSend8(uint32_t nSendID,uint8_t* pSendData,uint8_t nLength)
 
 	//デバイスクラスが登録済みなら送信
 	if(m_pVar->pDeviceClass)
+		{
 		nResult = m_pVar->pDeviceClass->OnCanSend(nSendID,pSendData,nLength);
+		}
 
 	//完了
 	return(nResult);

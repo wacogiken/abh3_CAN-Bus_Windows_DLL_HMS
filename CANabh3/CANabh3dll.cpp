@@ -82,8 +82,10 @@ int32_t GetFunctions(HMODULE hDLL,pCA3_FUNCLIST pFuncList)
 		pFuncList->GetBaudrate				= (CA3_GetBaudrate)GetDllFunc(hDLL,"GetBaudrate");
 		//PCが起動してからの時間を[ms]単位で取得
 		pFuncList->GetTm					= (CA3_GetTm)GetDllFunc(hDLL,"GetTm");
-		//1秒間に受信したデータ量を取得します
+		//バス占有カウンタの値を取得します
 		pFuncList->GetCounter				= (CA3_GetCounter)GetDllFunc(hDLL,"GetCounter");
+		//送受信カウンタの値を取得します
+		pFuncList->GetTransmitCounter		= (CA3_GetTransmitCounter)GetDllFunc(hDLL,"GetTransmitCounter");
 		//CANバスにエラーが発生しているか調べます
 		pFuncList->GetCANerror				= (CA3_GetCANerror)GetDllFunc(hDLL,"GetCANerror");
 		//CANバスのエラー解除を行います

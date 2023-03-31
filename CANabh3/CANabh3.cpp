@@ -175,6 +175,12 @@ CANABH3API uint32_t GetCounter()
 	return(g_pAbh3->GetCounter());
 	}
 
+//送受信カウンタを取得しますします
+CANABH3API uint32_t GetTransmitCounter(uint8_t nRecv)
+	{
+	return(g_pAbh3->GetTransmitCounter(nRecv));
+	}
+
 //CANバスにエラーが発生しているか調べます
 CANABH3API uint32_t GetCANerror()
 	{

@@ -110,6 +110,9 @@ CANABH3API uint32_t GetTm(void);
 //1秒間に受信したデータ量を取得します
 CANABH3API uint32_t GetCounter(void);
 
+//送受信カウンタを取得します
+CANABH3API uint32_t GetTransmitCounter(uint8_t nRecv);
+
 //CANバスにエラーが発生しているか調べます
 CANABH3API uint32_t GetCANerror(void);
 

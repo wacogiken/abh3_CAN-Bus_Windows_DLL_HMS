@@ -105,6 +105,7 @@ public:
 			}
 		return(nResult);
 		}	
+
 	//1秒間に送受信したデータ量を取得します
 	uint32_t GetCounter(void)
 		{
@@ -117,6 +118,16 @@ public:
 		return(nResult);
 		}
 
+	//送受信カウンタを取得します
+	uint32_t GetTransmitCounter(uint8_t nRecv)
+		{
+		if(m_pVar)
+			{
+			if(IsValidDevice())
+				return(m_pVar->pDeviceClass->GetTransmitCounter(nRecv));
+			}
+		return(0);
+		}
 
 	//CANバスにエラーが発生しているか調べます
 	uint32_t GetCANerror(void);

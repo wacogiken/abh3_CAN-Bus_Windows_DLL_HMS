@@ -578,6 +578,9 @@ int32_t CIxxatV2::OnOpenInterface(int32_t nDeviceNum)
 		return(-1);	//失敗扱いで戻る
 		}
 
+	//送受信カウンタ初期化
+	ClearTransmitCounter();
+
 	//処理完了
 	return(0);
 	}
@@ -754,8 +757,8 @@ int32_t CIxxatV2::OnCanSend(uint32_t nCanID,uint8_t* pData8,uint8_t nLength)
 			return(-1);
 			}
 
-		//カウンタの値に送信サイズ(dlc)を加算
-		AddCounter((uint32_t)payloadLen);
+		//バス占有カウンタと送信カウンタに加算
+		AddCounter(false,nCanID,(uint8_t*)pMsg->abData,(uint32_t)payloadLen);
 		}
 	else
 		{
@@ -927,16 +930,15 @@ uint32_t CIxxatV2::AddCanMsg(PCANMSG pMsg,int nCount /* 1 */)
 	uint32_t nResult = 0;
 	while(nCount)
 		{
-		//カウンタの値に受信サイズ(dlc)を加算
-		//ステータス等、多少余計な分が入るがそこまでの精度は求めていない
-		AddCounter((uint32_t)pMsg->uMsgInfo.Bits.dlc);
-
 		//登録要素はデータパケット？
 		if (pMsg->uMsgInfo.Bytes.bType == CAN_MSGTYPE_DATA)
 			{
 			//このパケットは無視しない対象か？
 			if(!IsIgnoreID(pMsg->dwMsgId))
 				{
+				//バス占有カウンタと受信カウンタに加算
+				AddCounter(true,pMsg->dwMsgId,(uint8_t*)pMsg->abData,(uint32_t)pMsg->uMsgInfo.Bits.dlc);
+
 				//バッファFULLでは無い？
 				if(m_nCanWritePt < 255)
 					{

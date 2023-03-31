@@ -79,8 +79,10 @@ typedef void(*CA3_SetBaudrate)(uint32_t);
 typedef uint32_t(*CA3_GetBaudrate)(void);
 //PCが起動してからの時間を[ms]単位で取得
 typedef uint32_t(*CA3_GetTm)(void);
-//1秒間に送受信したデータ量を取得します
+//バス占有カウンタを取得します
 typedef uint32_t(*CA3_GetCounter)(void);
+//送受信カウンタを取得します
+typedef uint32_t(*CA3_GetTransmitCounter)(uint8_t);
 //CANバスにエラーが発生しているか調べます
 typedef uint32_t(*CA3_GetCANerror)(void);
 //CANバスのエラー解除を行います
@@ -180,8 +182,10 @@ typedef struct _CA3_FUNCLIST
 	CA3_GetBaudrate			GetBaudrate;
 	//PCが起動してからの時間を[ms]単位で取得
 	CA3_GetTm				GetTm;
-	//1秒間に送受信したデータ量を取得します
+	//バスカウンタの値を取得します
 	CA3_GetCounter			GetCounter;
+	//送受信カウンタの値を取得します
+	CA3_GetTransmitCounter	GetTransmitCounter;
 	//CANバスにエラーが発生しているか調べます
 	CA3_GetCANerror			GetCANerror;
 	//CANバスのエラー解除を行います

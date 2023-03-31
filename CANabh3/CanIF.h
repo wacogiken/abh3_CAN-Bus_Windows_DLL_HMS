@@ -113,6 +113,21 @@ public:
 	//送受信サイズカウンタを取得
 	uint32_t GetCounter(void);
 
+	//送受信回数カウンタのクリア
+	void ClearTransmitCounter(void)
+		{
+		m_var.counter.nSendCounter = 0;
+		m_var.counter.nRecvCounter = 0;
+		}
+
+	//送受信回数カウンタの取得
+	uint32_t GetTransmitCounter(uint8_t nRecv)
+		{
+		if(nRecv)
+			return(m_var.counter.nRecvCounter);
+		return(m_var.counter.nSendCounter);
+		}
+
 //================================================================================
 //継承先のみ利用可能な関数
 //================================================================================
@@ -151,12 +166,68 @@ protected:
 		return(false);
 		}
 
-	//受信サイズカウンタに値を加算
-	void AddCounter(uint32_t nDLCsize)
+	//バスカウンタと送受信カウンタ加算
+	void AddCounter(bool bRecv,uint32_t nCanID,uint8_t* pData,uint32_t nDLCsize)
 		{
-		//実際のバス占有サイズは、ヘッダ54bits + (CRCd:1 + ACK:1 + ACKd:1 + EOF:7 + ITM:3) データbits数
-		uint32_t nBitSize = 54 + 13 + (nDLCsize * 8);
+		//ビットスタッフィングを含めたデータビット数計算を行いバス占有カウンタに加算
+		uint32_t nBitSize = CalcBitSize(nCanID,pData,nDLCsize);
 		m_var.counter.nBitSize += nBitSize;
+
+		//送受信カウンタは指定された側に加算する
+		if(bRecv)
+			++m_var.counter.nRecvCounter;
+		else
+			++m_var.counter.nSendCounter;
+		}
+
+	//ビットスタッフィング計算
+	uint32_t CalcBitSize(uint32_t nCanID,uint8_t* pData,uint8_t nDLCsize)
+		{
+		//基本サイズ
+		uint32_t nBaseBitSize = 54 + 13 + (nDLCsize * 8);
+		//ビットスタッフで増えるビット数
+		uint32_t nAddBitSize = CalcBitStuff((uint8_t*)&nCanID,4) + CalcBitStuff(pData,nDLCsize);
+		//加算した物を戻す
+		return(nBaseBitSize + nAddBitSize);
+		}
+
+	//4bit以上同じビットが続く数を算出
+	uint32_t CalcBitStuff(uint8_t* pValue,uint8_t nLength)
+		{
+		//
+		if(nLength == 0)
+			return(0);
+		//
+		uint32_t nResult = 0;
+		uint32_t nBit = 0;
+		uint32_t nCount = 0;
+		uint8_t nLastBit = ~*pValue & 1;
+		//
+		while(nLength)
+			{
+			uint8_t nBitData = (*pValue >> nBit) & 1;
+			if(nBitData == nLastBit)
+				{
+				if(++nCount >= 3)
+					{
+					nCount = 0;
+					nLastBit = ~nLastBit & 1;
+					++nResult;
+					}
+				}
+			else
+				{
+				nLastBit = nBitData;
+				nCount = 0;
+				}
+			if(++nBit >= 8)
+				{
+				nBit = 0;
+				++pValue;
+				--nLength;
+				}
+			}
+		return(nResult);
 		}
 
 //================================================================================
@@ -178,8 +249,12 @@ private:
 			} timeout;
 		struct _COUNTER
 			{
+			//バス占有カウンタ
 			uint32_t	nOldBitSize;//1つ前の基準時間で送受信したビットサイズ
 			uint32_t	nBitSize;	//現在の基準時間内に送受信したビットサイズ
+			//送受信カウンタ（インターフェース利用開始で0に設定される）
+			uint32_t	nSendCounter;
+			uint32_t	nRecvCounter;
 			} counter;
 
 
