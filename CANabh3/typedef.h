@@ -50,8 +50,10 @@
 typedef enum
 	{
 	UNKNOWN_PACKET		= 0,	//内部用（ユーザーでは利用しない）
-	SINGLE_PACKET		= 1,	//シングルパケット
-	BROADCAST_PACKET	= 2,	//ブロードキャストパケット
+	SINGLE_PACKET		= 1,	//返答：シングルパケット
+	BROADCAST_PACKET	= 2,	//返答：ブロードキャストパケット
+	//SINGLE_PACKET_W		= 3,	//要求：シングルパケット
+	//BROADCAST_PACKET_W	= 4,	//要求：ブロードキャストパケット
 	ANY_PACKET			= 0,	//パケット種類を問わない
 	} PACKETTYPE;
 

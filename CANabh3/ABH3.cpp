@@ -731,7 +731,7 @@ int32_t CAbh3::abh3_can_recv(uint8_t nTargetID,pCANABH3_RESULT pPtr,PACKETTYPE n
 			uint8_t nPacketTargetID = 0;
 			uint8_t nPacketGroup = 0;
 			uint8_t nPacketAdrs = 0;
-			PACKETTYPE nPacketType = recvid2any(pPtr->nID,nPacketSenderID,nPacketTargetID,nPacketGroup,nPacketAdrs);
+			PACKETTYPE nPacketType = recvid2any(pPtr->nID,nPacketSenderID,nPacketTargetID,nPacketGroup,nPacketAdrs,NULL);
 
 			//判定
 			if(nTargetID == nPacketTargetID)
@@ -823,7 +823,7 @@ int32_t CAbh3::CanRecv8(uint32_t* pRecvID,uint8_t* pRecvData)
 
 
 //受信IDから識別に必要な要素を抽出
-PACKETTYPE CAbh3::recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTargetID,uint8_t& nGroup,uint8_t& nAdrs)
+PACKETTYPE CAbh3::recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTargetID,uint8_t& nGroup,uint8_t& nAdrs,uint8_t* pRecvData)
 	{
 	//パラメータ
 	//	nCANID		受信したパケットのCANID（送信パケットのは使えないので注意）
@@ -844,13 +844,14 @@ PACKETTYPE CAbh3::recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTarget
 	uint8_t nD1 = uint8_t(nCANID >> 8);		//xxxxXXxx
 	uint8_t nD0 = uint8_t(nCANID);			//xxxxxxXX
 
+
 	//(確定)送信元
 	nSenderID = nD0;
 
 	//ブロードキャストパケットの返答？(xxFFxxxx)
 	if(nD2 == 0xff)
 		{
-		//(確定)種類はブロードキャストパケット
+		//(確定)ブロードキャストパケット
 		nResult = PACKETTYPE::BROADCAST_PACKET;
 		//(確定)グループ番号とアドレス
 		nAdrs = nD1 & 0x07;				//(bit:xxxxxXXX)
@@ -858,24 +859,33 @@ PACKETTYPE CAbh3::recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTarget
 		//受信先は含まれない為、ホストIDを設定する
 		nTargetID = GetHostID();
 		}
-	else
+	//シングルパケットの返答又は要求？(xxEFxxxx)
+	else if(nD2 == GetSinglePacketCode(nSenderID))
 		{
-		//送信元のPDUコードと一致するか？(xxXXxxxx)
-		if(nD2 == GetSinglePacketCode(nSenderID))
+		//(確定)シングルパケット
+		nResult = PACKETTYPE::SINGLE_PACKET;
+		//(確定)受信先
+		nTargetID = nD1;
+		//グループとアドレスは含まれない為、0を設定する
+		nGroup = 0;
+		nAdrs = 0;
+		}
+	//受信データ指定有り？（ブロードキャスト要求を判断する場合は指定必須）
+	else if(pRecvData)
+		{
+		//ブロードキャストパケットの要求？(xxEAxxxx)
+		if(nD2 == GetBroadcastPacketCode(nSenderID))
 			{
-			//(確定)シングルパケット
-			nResult = PACKETTYPE::SINGLE_PACKET;
+			//(確定)ブロードキャストパケット
+			nResult = PACKETTYPE::BROADCAST_PACKET;
+			//(確定)グループ番号とアドレス
+			nAdrs = pRecvData[0] & 0x07;	//下位3bit
+			nGroup = (pRecvData[0] >> 3) & 0x1f;		//上位5bit
 			//(確定)受信先
 			nTargetID = nD1;
-			//グループとアドレスは含まれない為、0を設定する
-			nGroup = 0;
-			nAdrs = 0;
-			}
-		else
-			{
-			//不明なパケット
 			}
 		}
+
 	//
 	return(nResult);
 	}
@@ -895,7 +905,7 @@ void CAbh3::StockLastRecvData(uint32_t nRecvID,uint8_t* pRecvData)
 	uint8_t nTargetID = 0;
 	uint8_t nGroup = 0;
 	uint8_t nAdrs = 0;
-	PACKETTYPE nType = recvid2any(nRecvID,nSenderID,nTargetID,nGroup,nAdrs);
+	PACKETTYPE nType = recvid2any(nRecvID,nSenderID,nTargetID,nGroup,nAdrs,pRecvData);
 
 	//格納先
 	pCANABH3_LASTRECV pLastdata = GetLastRecvData(nSenderID);
@@ -903,6 +913,7 @@ void CAbh3::StockLastRecvData(uint32_t nRecvID,uint8_t* pRecvData)
 	//シングルパケット？
 	if(nType == PACKETTYPE::SINGLE_PACKET)
 		{
+		//格納先にコピー
 		::CopyMemory(&pLastdata->DP0R,pRecvData,8);
 		//更新フラグ
 		pLastdata->update[0].nUpdate = 1;
@@ -910,6 +921,7 @@ void CAbh3::StockLastRecvData(uint32_t nRecvID,uint8_t* pRecvData)
 	//ブロードキャストパケット？
 	else if(nType == PACKETTYPE::BROADCAST_PACKET)
 		{
+		//各アドレスに保存
 		if(nAdrs == 0)
 			::CopyMemory(&pLastdata->BR0,pRecvData,8);
 		else if(nAdrs == 1)

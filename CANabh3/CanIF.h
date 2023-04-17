@@ -194,14 +194,17 @@ protected:
 	//4bit以上同じビットが続く数を算出
 	uint32_t CalcBitStuff(uint8_t* pValue,uint8_t nLength)
 		{
+		//注意点
+		//	MSB側から調べる(bit7 -> bit0)
+
 		//
 		if(nLength == 0)
 			return(0);
 		//
 		uint32_t nResult = 0;
-		uint32_t nBit = 0;
+		uint32_t nBit = 7;
 		uint32_t nCount = 0;
-		uint8_t nLastBit = ~*pValue & 1;
+		uint8_t nLastBit = ~(*pValue >> 7) & 1;
 		//
 		while(nLength)
 			{
@@ -220,12 +223,14 @@ protected:
 				nLastBit = nBitData;
 				nCount = 0;
 				}
-			if(++nBit >= 8)
+			if(nBit == 0)
 				{
-				nBit = 0;
+				nBit = 7;
 				++pValue;
 				--nLength;
 				}
+			else
+				--nBit;
 			}
 		return(nResult);
 		}
