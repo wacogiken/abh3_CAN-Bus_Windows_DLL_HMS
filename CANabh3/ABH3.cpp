@@ -485,7 +485,7 @@ int32_t CAbh3::abh3_can_reqBRD(uint8_t nTargetID,uint8_t num,uint8_t nBroadcast,
 			//固定長で送信
 			nResult = CanSend8(nSendID,pPacket,3);
 
-			//受信バッファ指定有りでここ迄エラー無しならシングルパケットDP0を受信
+			//受信バッファ指定有りでここ迄エラー無しならブロードキャストパケットを受信
 			if(pPtr && (nResult == 0))
 				{
 				int nAdrs = num & 0x07;	//下位3ビットがアドレス
@@ -685,6 +685,7 @@ int32_t CAbh3::abh3_can_recv(uint8_t nTargetID,pCANABH3_RESULT pPtr,PACKETTYPE n
 	//概要
 	//	CANインターフェースからデータを受信
 	//パラメータ
+	//	nTargetID		この発信元から来たパケットを対象とする
 	//	pPtr			受信データ格納先へのポインタ
 	//	nType			受信を終了するパケット種類
 	//					PACKETTYPE::SINGLE_PACLET 又は PACKETTYPE::BROADCAST_PACKET を指定する
@@ -734,20 +735,23 @@ int32_t CAbh3::abh3_can_recv(uint8_t nTargetID,pCANABH3_RESULT pPtr,PACKETTYPE n
 			PACKETTYPE nPacketType = recvid2any(pPtr->nID,nPacketSenderID,nPacketTargetID,nPacketGroup,nPacketAdrs,NULL);
 
 			//判定
-			if(nTargetID == nPacketTargetID)
+
+			//シングルパケット指定？
+			if((nType == PACKETTYPE::SINGLE_PACKET) && (nPacketType == PACKETTYPE::SINGLE_PACKET))
 				{
-				//シングルパケット指定？
-				if((nType == PACKETTYPE::SINGLE_PACKET) && (nPacketType == PACKETTYPE::SINGLE_PACKET))
-					break;
-				else if(nType == PACKETTYPE::BROADCAST_PACKET)
-					{
-					if((nPacketType == PACKETTYPE::BROADCAST_PACKET) && (nAdrs == nPacketAdrs))
-						break;
-					}
+				//発信元が指定した所？
+				if(nTargetID == nPacketSenderID)
+					break;	//該当
 				}
-			else
+			//ブロードキャストパケット指定？
+			else if(nType == PACKETTYPE::BROADCAST_PACKET)
 				{
-				//指定した相手ではない所から発信されたパケットを受信
+				if((nPacketType == PACKETTYPE::BROADCAST_PACKET) && (nAdrs == nPacketAdrs))
+					{
+					//発信元が指定した所？
+					if(nTargetID == nPacketSenderID)
+						break;	//該当
+					}
 				}
 			}
 		else
