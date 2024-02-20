@@ -99,7 +99,7 @@ typedef int32_t(*CA3_abh3_can_port_init)(void);
 //指令の初期化
 typedef int32_t(*CA3_abh3_cmd_init)(uint8_t,pCANABH3_RESULT);
 //現在の受信データ状況を一括取得
-typedef void(*CA3_abh3_can_copylastdata)(uint8_t,pCANABH3_LASTRECV);
+typedef void(*CA3_abh3_can_copylastdata)(uint8_t,pCANABH3_LASTDATA);
 //現在の受信データ状況の更新フラグを解除する
 typedef void(*CA3_abh3_can_resetlastdata)(uint8_t,int32_t);
 //受信対象を指定して受信

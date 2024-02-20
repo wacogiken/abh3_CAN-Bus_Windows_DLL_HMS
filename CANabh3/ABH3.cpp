@@ -429,6 +429,9 @@ int32_t CAbh3::abh3_can_cmdAndopSet(uint8_t nTargetID,int16_t cmdAY,int16_t cmdB
 			//送信先IDを作成
 			uint32_t nSendID = CreateSinglePacketID(nTargetID);
 
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,8,true);
+
 			//固定長で送信
 			nResult = CanSend8(nSendID,pPacket,8);
 
@@ -481,6 +484,9 @@ int32_t CAbh3::abh3_can_reqBRD(uint8_t nTargetID,uint8_t num,uint8_t nBroadcast,
 
 			//送信先CANIDを作成
 			uint32_t nSendID = CreateBroadcastPacketID(nTargetID,num,nBroadcast);
+
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,3,false);
 
 			//固定長で送信
 			nResult = CanSend8(nSendID,pPacket,3);
@@ -587,11 +593,12 @@ int32_t CAbh3::abh3_can_trans(uint8_t nTargetID,char* sbuf,char*& rbuf,size_t& r
 	}
 
 //現在の受信データ状況を一括取得
-void CAbh3::abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTRECV pDst)
+void CAbh3::abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTDATA pPtr)
 	{
-	pCANABH3_LASTRECV pSrc = GetLastRecvData(nTargetID);
-	if(pSrc)
-		::CopyMemory(pDst,pSrc,sizeof(CANABH3_LASTRECV));
+	//
+	pCANABH3_LASTDATA pSrc = GetLastData(nTargetID);
+	if(pSrc && pPtr)
+		::CopyMemory(pPtr,pSrc,sizeof(CANABH3_LASTDATA));
 	}
 
 //受信データ状況の指定箇所の更新フラグを解除
@@ -603,7 +610,11 @@ void CAbh3::abh3_can_resetlastdata(uint8_t nTargetID,int32_t nAdrs)
 			abh3_can_resetlastdata(nTargetID,nAdrs);
 		}
 	else
-		m_pVar->lastdata.recv[nTargetID].update[nAdrs & 0x7].nUpdate = 0;
+		{
+		pCANABH3_LASTRECV pSrc = GetLastRecvData(nTargetID);
+		if(pSrc)
+			pSrc->update[nAdrs & 0x7].nUpdate = 0;
+		}
 	}
 
 //受信(外部用・排他制御あり)
@@ -894,6 +905,29 @@ PACKETTYPE CAbh3::recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTarget
 	return(nResult);
 	}
 
+//送信するパケットデータを最終データとして格納
+void CAbh3::StockLastSendData(uint8_t nSendID,uint8_t* pSendData,uint8_t nLength,bool bSinglePacket)
+	{
+	//
+	pCANABH3_LASTSEND pLastdata = GetLastSendData(nSendID);
+	if(pLastdata == NULL)
+		return;	//準備前
+	//シングルパケット？
+	if(bSinglePacket)
+		{
+		//
+		CopyMemory(pLastdata->DP0R.packet,pSendData,nLength);
+		pLastdata->DP0R.nLength = nLength;
+		}
+	else if((pSendData[0] == 0x00) && (pSendData[1] == 0xff))
+		{
+		//ブロードキャストパケット
+		uint8_t nGroup = (pSendData[2] >> 3) & 0xf;
+		uint8_t nAdrs = (pSendData[2] & 0x7);
+		CopyMemory(pLastdata->BR[nAdrs].packet,pSendData,nLength);
+		pLastdata->BR[nAdrs].nLength = nLength;
+		}
+	}
 
 //受信したデータを最終データとして格納
 void CAbh3::StockLastRecvData(uint32_t nRecvID,uint8_t* pRecvData)
@@ -1003,8 +1037,13 @@ int32_t CAbh3::CanTermSendMulti(uint8_t nTargetID,uint8_t* pSendData,uint32_t nS
 			//送信許可パケット数を初期化（ホストの最大値）
 			nMaxPacket = 0xff;
 
-			//CM_RTS送信
+			//CM_RTSパケット構築
 			uint8_t* pPacket = CCan1939::CreateCMRTS(nSendDataSize,nMaxPacket);
+
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,8,false);
+
+			//送信
 			nResult = CanSend8(nSendID,pPacket,8);
 
 			//パケットの開放
@@ -1109,6 +1148,9 @@ int32_t CAbh3::CanTermSendMulti(uint8_t nTargetID,uint8_t* pSendData,uint32_t nS
 				//送信対象のデータが有る？
 				if(pPacket)
 					{
+					//送信パケットを保存
+					StockLastSendData(nTargetID,pPacket,8,false);
+
 					//送信
 					nResult = CanSend8(nSendDTID,pPacket,8);	//CM_DT送信
 
@@ -1207,6 +1249,11 @@ int32_t CAbh3::CanTermSendMulti(uint8_t nTargetID,uint8_t* pSendData,uint32_t nS
 			//CM_CTSパケットを作って送信
 			uint8_t nRemainPacket = nMaxPacket - nPacketNum + 1;				//残りのパケット数
 			uint8_t* pPacket = CCan1939::CreateCMCTS(nRemainPacket,nPacketNum);
+
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,8,false);
+
+			//送信
 			nResult = CanSend8(nSendID,pPacket,8);
 
 			//パケットの開放
@@ -1306,6 +1353,11 @@ int32_t CAbh3::CanTermSendMulti(uint8_t nTargetID,uint8_t* pSendData,uint32_t nS
 			{
 			//パケットを作って送信
 			uint8_t* pPacket = CCan1939::CreateCMEOMA(nTotalPacket * 8,nTotalPacket);
+
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,8,false);
+
+			//
 			nResult = CanSend8(nSendID,pPacket,8);
 	
 			//パケットの開放
@@ -1339,6 +1391,10 @@ int32_t CAbh3::CanTermSendMulti(uint8_t nTargetID,uint8_t* pSendData,uint32_t nS
 			{
 			//ABORTパケットを作って送信
 			uint8_t* pPacket = CCan1939::CreateCMABORT(nAbort);
+
+			//送信パケットを保存
+			StockLastSendData(nTargetID,pPacket,8,false);
+
 			nResult = CanSend8(nSendID,pPacket,8);
 
 			//パケットの開放

@@ -47,6 +47,12 @@ ROS Package for <a href="https://www.wacogiken.co.jp/agv/abh3.html">ABH3</a> Dri
             <th bgcolor="blue"><font color="white">Notice</font></th>
         </tr>
         <tr>
+            <td>1.0.0.17</td>
+            <td>2024/02/25</td>
+            <td>Y.OGAWA</td>
+            <td>6th release<br>Support capture for incoming and outgoind data.</td>
+        </tr>
+        <tr>
             <td>1.0.0.5</td>
             <td>2023/04/25</td>
             <td>Y.OGAWA</td>

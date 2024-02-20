@@ -257,7 +257,7 @@ CANABH3API int32_t abh3_cmd_init(uint8_t nTargetID,pCANABH3_RESULT pPtr)
 	}
 
 //現在の受信データ状況を一括取得
-CANABH3API void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTRECV pPtr)
+CANABH3API void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTDATA pPtr)
 	{
 	//概要
 	//	現在の通信先から受信したデータ領域の複製を取得する

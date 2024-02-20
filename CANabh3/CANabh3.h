@@ -155,7 +155,7 @@ CANABH3API int32_t abh3_can_reqBRD(uint8_t nTargetID,uint8_t num,uint8_t nBroadc
 CANABH3API int32_t abh3_can_trans(uint8_t nTargetID,char* sbuf,char* rbuf,uint32_t* rbuflen);
 
 //現在の受信データ領域の複製を取得
-CANABH3API void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTRECV pPtr);
+CANABH3API void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTDATA pPtr);
 
 //受信データ領域の更新フラグを解除
 CANABH3API void abh3_can_resetlastdata(uint8_t nTargetID,int32_t nAdrs);

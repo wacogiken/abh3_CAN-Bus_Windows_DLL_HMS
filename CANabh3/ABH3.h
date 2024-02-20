@@ -191,7 +191,7 @@ public:
 	//マルチパケットによるTelABH3パケットの送受信
 	int32_t abh3_can_trans(uint8_t nTargetID,char* sbuf,char*& rbuf,size_t& rbuflen);
 	//現在の受信データ状況を一括取得
-	void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTRECV pDst);
+	void abh3_can_copylastdata(uint8_t nTargetID,pCANABH3_LASTDATA pPtr);
 	//受信データ状況の指定箇所の更新フラグを解除
 	void abh3_can_resetlastdata(uint8_t nTargetID,int32_t nAdrs);
 	//受信(外部用・排他制御あり)
@@ -271,14 +271,6 @@ protected:
 			} target[256];
 		} CANABH3_CONFIG,*pCANABH3_CONFIG;
 
-	//
-	typedef struct _CANABH3_LASTSEND
-		{
-		int16_t		nOrderAY;
-		int16_t		nOrderBX;
-		uint32_t	nInputBit;
-		} CANABH3_LASTSEND,*pCANABH3_LASTSEND;
-
 	//内部用変数
 	typedef struct _CANABH3_VAR
 		{
@@ -287,14 +279,7 @@ protected:
 		int32_t				nOpenDevice;	//0..開いていない  1以上..開いたインターフェース番号+1が入る
 		HANDLE				hTerm;			//通信排他用のセマフォ
 		CANABH3_CONFIG		config;			//設定
-		//最終データ関連（送信・受信）
-		struct _CANABH3_LASTDATA
-			{
-			//過去に把握したデータ（送信）
-			CANABH3_LASTSEND send[256];
-			//過去に把握したデータ（受信）
-			CANABH3_LASTRECV recv[256];
-			} lastdata;
+		CANABH3_LASTDATA	lastdata[256];	//最終データ関連（送信・受信）
 		} CANABH3_VAR,*pCANABH3_VAR;
 
 	//内部変数（動的確保して使う）
@@ -303,22 +288,31 @@ protected:
 	//受信IDから識別に必要な要素を抽出
 	PACKETTYPE recvid2any(uint32_t nCANID,uint8_t& nSenderID,uint8_t& nTargetID,uint8_t& nGroup,uint8_t& nAdrs,uint8_t* pRecvData);
 
-	//最終送信データ領域を取得
-	pCANABH3_LASTSEND GetLastSendData(uint8_t nID)
+	//最終受信データ領域を取得）
+	pCANABH3_LASTDATA GetLastData(uint8_t nID)
 		{
-		pCANABH3_LASTSEND pResult = NULL;
+		pCANABH3_LASTDATA pResult = NULL;
 		if(m_pVar)
-			pResult = &m_pVar->lastdata.send[nID];
+			pResult = &m_pVar->lastdata[nID];
 		return(pResult);
 		}
 
-	//最終受信データ領域を取得
+	//最終送信データ領域を取得（CANに送信されるデータの領域もある）
+	pCANABH3_LASTSEND GetLastSendData(uint8_t nID)
+		{
+		pCANABH3_LASTDATA pResult = GetLastData(nID);
+		if(pResult)
+			return(&pResult->send);
+		return(NULL);
+		}
+
+	//最終受信データ領域を取得（CANから受信したデータと同じ）
 	pCANABH3_LASTRECV GetLastRecvData(uint8_t nID)
 		{
-		pCANABH3_LASTRECV pResult = NULL;
-		if(m_pVar)
-			pResult = &m_pVar->lastdata.recv[nID];
-		return(pResult);
+		pCANABH3_LASTDATA pResult = GetLastData(nID);
+		if(pResult)
+			return(&pResult->recv);
+		return(NULL);
 		}
 
 	//デバイスクラスが登録されているか？
@@ -431,6 +425,10 @@ protected:
 
 	//受信したデータを最終データとして格納
 	void StockLastRecvData(uint32_t nRecvID,uint8_t* pRecvData);
+
+	//送信するパケットデータを最終データとして格納
+	void StockLastSendData(uint8_t nSendID,uint8_t* pSendData,uint8_t nLength,bool bSinglePacket);
+
 
 	//CANIDから発信元をを取得
 	uint8_t canid2fromid(uint32_t nID)

@@ -127,7 +127,31 @@ typedef struct _CANABH3_RESULT
 		} u;
 	} CANABH3_RESULT,*pCANABH3_RESULT;
 
-//最終受信データ用構造体
+//最終送信データ用構造体
+typedef struct _CANABH3_LASTSEND
+	{
+	//指令類
+	int16_t		nOrderAY;
+	int16_t		nOrderBX;
+	uint32_t	nInputBit;
+
+	//送信パケット類
+
+	//シングルパケット(DP0)
+	struct _DP0R
+		{
+		uint8_t		packet[8];				//　パケットデータ
+		uint8_t		nLength;				//	パケット長
+		} DP0R;
+	//ブロードキャストパケット(0-7)
+	struct _BR
+		{
+		uint8_t		packet[8];				//　パケットデータ
+		uint8_t		nLength;				//	パケット長
+		} BR[8];
+	} CANABH3_LASTSEND,*pCANABH3_LASTSEND;
+
+//最終受信データ用構造体（最終送信データを含む）
 typedef struct _CANABH3_LASTRECV
 	{
 	//シングルパケット(DP0)
@@ -190,7 +214,16 @@ typedef struct _CANABH3_LASTRECV
 		{
 		uint8_t		nUpdate;				//0以外で値が更新されている（受信している）
 		} update[8];						//0..DP0R  1..BR0  2..BR1  ....  7..BR6
+
 	} CANABH3_LASTRECV,*pCANABH3_LASTRECV;
+
+//最終データ関連（送信・受信）
+typedef struct _CANABH3_LASTDATA
+	{
+	//過去に把握したデータ（受信・送信）
+	CANABH3_LASTRECV recv;
+	CANABH3_LASTSEND send;
+	} CANABH3_LASTDATA,*pCANABH3_LASTDATA;
 
 //PACK_FLOAT構造体
 typedef struct _PACK_FLOAT
